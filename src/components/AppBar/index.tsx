@@ -67,7 +67,7 @@ const AppBar = () => {
                         <Button
                             variant="primary"
                             size="sm"
-                            onClick={() => router.push('/Signup')}
+                            onClick={() => router.push('/Register')}
                         >
                             Começar Agora
                         </Button>
@@ -116,7 +116,7 @@ const AppBar = () => {
                                     variant="primary"
                                     className="w-full justify-center shadow-md"
                                     onClick={() => {
-                                        router.push('/Signup')
+                                        router.push('/Register')
                                         setIsMenuOpen(false)
                                     }}
                                 >

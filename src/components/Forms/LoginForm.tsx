@@ -1,4 +1,3 @@
-// components/forms/LoginForm.tsx
 'use client'
 
 import { useState } from 'react'
@@ -6,19 +5,21 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Mail, Lock, Loader2 } from 'lucide-react'
+import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react'
+import Input from '@/components/ui/input'
+import Button from '@/components/ui/button'
 
 const loginSchema = z.object({
-    email: z.string().email('Email inválido'),
-    password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres')
+    email: z.string().email('Insira um e-mail válido'),
+    password: z.string().min(1, 'A senha é obrigatória')
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-const LoginForm = () => {
+export default function LoginForm() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState('')
+    const [rootError, setRootError] = useState('') 
 
     const {
         register,
@@ -30,73 +31,84 @@ const LoginForm = () => {
 
     const onSubmit = async (data: LoginFormData) => {
         setIsLoading(true)
-        setError('')
+        setRootError('')
 
         try {
-            // Simulação de API call
-            console.log('Login attempt:', data)
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            console.log('Tentativa de login:', data)
+            // Simulação de delay de rede
+            await new Promise(resolve => setTimeout(resolve, 1500))
 
-            // Simulação de login bem-sucedido
-            // Em produção, você faria:
-            // const response = await fetch('/api/auth/login', {...})
+            // Lógica de sucesso aqui
+            // await signIn('credentials', { ... }) 
 
-            // Redireciona para dashboard
             router.push('/dashboard')
-
         } catch (err) {
-            setError('Credenciais inválidas. Tente novamente.')
-            console.error('Login error:', err)
+            console.error(err)
+            setRootError('E-mail ou senha incorretos. Por favor, tente novamente.')
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <div className="max-w-md mx-auto p-8 bg-white rounded-2xl shadow-xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-                Acesse sua conta
-            </h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
 
-            {error && (
-                <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                    {error}
+            {rootError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 text-sm animate-fade-in-up">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{rootError}</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* ... campos do formulário ... */}
-
-                <button
-                    type="submit" // ✅ IMPORTANTE: type="submit"
+            <div className="space-y-4">
+                <Input
+                    label="E-mail profissional"
+                    type="email"
+                    placeholder="nome@hospital.com"
+                    icon={Mail}
+                    error={errors.email?.message} 
                     disabled={isLoading}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Entrando...
-                        </>
-                    ) : (
-                        'Entrar'
-                    )}
-                </button>
+                    {...register('email')}
+                />
 
-                <div className="text-center mt-6">
-                    <p className="text-sm text-gray-600">
-                        Não tem uma conta?{' '}
+                <div className="space-y-1">
+                    <Input
+                        label="Senha"
+                        type="password"
+                        placeholder="••••••••"
+                        icon={Lock}
+                        error={errors.password?.message}
+                        disabled={isLoading}
+                        {...register('password')}
+                    />
+
+                    <div className="flex justify-end">
                         <button
-                            type="button" // ✅ IMPORTANTE: type="button" para não submeter o form
-                            onClick={() => router.push('/register')}
-                            className="font-medium text-blue-600 hover:text-blue-700"
+                            type="button"
+                            onClick={() => router.push('/ForgotPassword')}
+                            className="text-xs font-medium text-teal-600 hover:text-teal-700 transition-colors focus:outline-none focus:underline"
+                            disabled={isLoading}
                         >
-                            Cadastre-se
+                            Esqueceu a senha?
                         </button>
-                    </p>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full shadow-lg shadow-teal-600/20"
+                isLoading={isLoading}
+            >
+                {isLoading ? 'Autenticando...' : 'Acessar Conta'}
+                {!isLoading && <ArrowRight className="ml-2 w-4 h-4" />}
+            </Button>
+
+            <p className="text-xs text-center text-slate-400 mt-6">
+                Protegido por criptografia de ponta a ponta.
+            </p>
+        </form>
     )
 }
-
-export default LoginForm
