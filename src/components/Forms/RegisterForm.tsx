@@ -6,12 +6,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react'
-
-// Componentes do Design System
 import Input from '@/components/ui/input'
 import Button from '@/components/ui/button'
 
-// Schema de validação
 const registerSchema = z.object({
     name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
     email: z.string().email('Insira um e-mail válido'),
@@ -42,7 +39,6 @@ export default function RegisterForm() {
         setRootError('')
 
         try {
-            // Simulação de delay
             await new Promise(resolve => setTimeout(resolve, 1500))
 
             console.log('Dados de registro:', data)
@@ -50,7 +46,8 @@ export default function RegisterForm() {
 
             router.push('/login?registered=true')
 
-        } catch (err) {
+        } catch (error) {
+            console.log(error)
             setRootError('Não foi possível criar a conta. Tente novamente mais tarde.')
         } finally {
             setIsLoading(false)
@@ -62,7 +59,7 @@ export default function RegisterForm() {
 
             {rootError && (
                 <div className="p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 text-sm animate-fade-in-up">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{rootError}</span>
                 </div>
             )}
@@ -109,7 +106,6 @@ export default function RegisterForm() {
                 />
             </div>
 
-            {/* Checkbox de Termos estilizado */}
             <div className="flex items-start gap-3 pt-2">
                 <div className="flex h-6 items-center">
                     <input

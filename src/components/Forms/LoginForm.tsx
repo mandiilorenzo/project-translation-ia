@@ -41,7 +41,7 @@ export default function LoginForm() {
             // Lógica de sucesso aqui
             // await signIn('credentials', { ... }) 
 
-            router.push('/dashboard')
+            router.push('/Dashboard')
         } catch (err) {
             console.error(err)
             setRootError('E-mail ou senha incorretos. Por favor, tente novamente.')
