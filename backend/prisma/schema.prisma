@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  
+  articles  Article[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("users")
+}
+
+model Article {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  originalTitle       String?
+  translatedTitle     String?
+  originalContent     String?   @db.Text
+  translatedContent   String?   @db.Text
+  sourceUrl           String?
+  fileName            String?
+  fileSize            Int?
+  fileType            String?
+  filePath            String?
+  
+  status              ArticleStatus @default(PENDING)
+  sourceLanguage      String?       @default("en")
+  targetLanguage      String?       @default("pt-BR")
+  wordCount           Int?
+  processingTime      Int?
+  errorMessage        String?
+  
+  metadata            Json?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("articles")
+}
+
+enum Role {
+  USER
+  PROFESSIONAL
+  ADMIN
+}
+
+enum ArticleStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
