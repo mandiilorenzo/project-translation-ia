@@ -5,10 +5,8 @@ import { RegisterInput, LoginInput, AuthResponse } from "../types/auth";
 const prisma = new PrismaClient();
 
 export class AuthService {
-  // Registrar novo usuário
   static async register(data: RegisterInput): Promise<AuthResponse> {
     try {
-      // Validar email
       if (!Validation.isEmail(data.email)) {
         return {
           success: false,
@@ -16,7 +14,6 @@ export class AuthService {
         };
       }
 
-      // Validar senha
       if (!Validation.isStrongPassword(data.password)) {
         return {
           success: false,
@@ -25,7 +22,6 @@ export class AuthService {
         };
       }
 
-      // Verificar se email já existe
       const existingUser = await prisma.user.findUnique({
         where: { email: data.email },
       });
@@ -37,10 +33,8 @@ export class AuthService {
         };
       }
 
-      // Hash da senha
       const hashedPassword = await Password.hash(data.password);
 
-      // Criar usuário
       const user = await prisma.user.create({
         data: {
           email: data.email,
@@ -58,7 +52,6 @@ export class AuthService {
         },
       });
 
-      // Gerar token JWT
       const token = Token.generate(user.id);
 
       return {
@@ -76,10 +69,8 @@ export class AuthService {
     }
   }
 
-  // Login de usuário
   static async login(data: LoginInput): Promise<AuthResponse> {
     try {
-      // Validar email
       if (!Validation.isEmail(data.email)) {
         return {
           success: false,
@@ -87,7 +78,6 @@ export class AuthService {
         };
       }
 
-      // Buscar usuário
       const user = await prisma.user.findUnique({
         where: { email: data.email },
         select: {
@@ -108,7 +98,6 @@ export class AuthService {
         };
       }
 
-      // Verificar senha
       const isValidPassword = await Password.compare(
         data.password,
         user.password
@@ -121,10 +110,8 @@ export class AuthService {
         };
       }
 
-      // Remover senha do objeto user
       const { password, ...userWithoutPassword } = user;
 
-      // Gerar token JWT
       const token = Token.generate(user.id);
 
       return {
@@ -142,7 +129,6 @@ export class AuthService {
     }
   }
 
-  // Obter perfil do usuário
   static async getProfile(userId: string) {
     try {
       const user = await prisma.user.findUnique({
@@ -178,7 +164,6 @@ export class AuthService {
     }
   }
 
-  // Atualizar perfil
   static async updateProfile(userId: string, data: { name?: string }) {
     try {
       const user = await prisma.user.update({

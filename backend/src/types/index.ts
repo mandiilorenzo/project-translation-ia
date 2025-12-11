@@ -28,12 +28,6 @@ export interface Article {
   updatedAt: Date;
 }
 
-export interface AuthRequest {
-  email: string;
-  password: string;
-  name?: string;
-}
-
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;

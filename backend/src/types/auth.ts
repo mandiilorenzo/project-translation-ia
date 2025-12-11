@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export interface RegisterInput {
   email: string;
   password: string;
@@ -21,6 +23,15 @@ export interface AuthResponse {
     updatedAt: Date;
   };
   token?: string;
+}
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    name: string | null;
+    role: string;
+  };
 }
 
 export interface ApiError {

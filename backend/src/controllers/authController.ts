@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/authService'; 
-import { RegisterInput, LoginInput } from '../types/auth'; 
-import { AuthRequest } from '../middleware/authMiddleware'; 
+import { RegisterInput, LoginInput, AuthRequest  } from '../types/auth'; 
 
 export class AuthController {
-  // Registrar usuário
+  
   static async register(req: Request, res: Response) {
     try {
       const { email, password, name }: RegisterInput = req.body;
 
-      // Validação básica
       if (!email || !password) {
         return res.status(400).json({
           success: false,
@@ -23,12 +21,11 @@ export class AuthController {
         return res.status(400).json(result);
       }
 
-      // Setar cookie com token
       res.cookie('token', result.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax', // ✅ Mudado para 'lax' (funciona melhor em dev)
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
+        sameSite: 'lax', 
+        maxAge: 7 * 24 * 60 * 60 * 1000 
       });
 
       res.status(201).json(result);
@@ -42,12 +39,10 @@ export class AuthController {
     }
   }
 
-  // Login de usuário
   static async login(req: Request, res: Response) {
     try {
       const { email, password }: LoginInput = req.body;
 
-      // Validação básica
       if (!email || !password) {
         return res.status(400).json({
           success: false,
@@ -61,12 +56,11 @@ export class AuthController {
         return res.status(401).json(result);
       }
 
-      // Setar cookie com token
       res.cookie('token', result.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax', // ✅ Mudado para 'lax'
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
+        sameSite: 'lax', 
+        maxAge: 7 * 24 * 60 * 60 * 1000 
       });
 
       res.status(200).json(result);
@@ -80,10 +74,8 @@ export class AuthController {
     }
   }
 
-  // Logout
   static async logout(req: Request, res: Response) {
     try {
-      // Limpar cookie
       res.clearCookie('token');
       
       res.status(200).json({
@@ -100,11 +92,9 @@ export class AuthController {
     }
   }
 
-  // Obter perfil do usuário atual
   static async getProfile(req: AuthRequest, res: Response) {
     try {
-      // Agora req.user está disponível (middleware já validou)
-      const userId = req.user!.id; // ✅ Usamos ! porque middleware já validou
+      const userId = req.user!.id; 
       const result = await AuthService.getProfile(userId);
 
       if (!result.success) {
@@ -122,13 +112,11 @@ export class AuthController {
     }
   }
 
-  // Atualizar perfil
   static async updateProfile(req: AuthRequest, res: Response) {
     try {
       const userId = req.user!.id;
       const { name } = req.body;
 
-      // Validação básica
       if (name && name.trim().length < 2) {
         return res.status(400).json({
           success: false,
@@ -153,7 +141,6 @@ export class AuthController {
     }
   }
 
-  // Verificar autenticação (health check para auth)
   static async verify(req: AuthRequest, res: Response) {
     try {
       res.status(200).json({
