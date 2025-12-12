@@ -5,6 +5,7 @@ import { RegisterInput, LoginInput, AuthResponse } from "../types/auth";
 const prisma = new PrismaClient();
 
 export class AuthService {
+  
   static async register(data: RegisterInput): Promise<AuthResponse> {
     try {
       if (!Validation.isEmail(data.email)) {
