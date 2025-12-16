@@ -1,29 +1,25 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ArticleStatus } from "@prisma/client";
 import { extractTextFromBuffer } from "../utils/fileExtractor";
 import { CreateArticleInput } from "@/types/article";
+import { TranslationService } from "../services/translationService";
 import fs from "fs";
 
 const prisma = new PrismaClient();
 
 export class ArticleService {
   static async create(userId: string, data: CreateArticleInput) {
+    console.log(`🚀 Processando: ${data.fileName}`);
+
     try {
       const buffer = fs.readFileSync(data.filePath);
-
       const { text, metadata, method } = await extractTextFromBuffer(
         buffer,
         data.fileType
       );
 
-      if (!text || !text.trim()) {
-        throw new Error("O texto extraído está vazio. Verifique se o arquivo contém texto selecionável.");
-      }
+      if (!text.trim()) throw new Error("Texto extraído está vazio");
 
-      const title =
-        metadata?.title ||
-        data.originalTitle ||
-        data.fileName.replace(/\.[^/.]+$/, "") ||
-        "Artigo sem título";
+      const title = metadata?.title || data.originalTitle || data.fileName;
 
       const article = await prisma.article.create({
         data: {
@@ -33,40 +29,42 @@ export class ArticleService {
           fileSize: data.fileSize,
           fileType: data.fileType,
           originalTitle: title,
-          sourceLanguage: data.sourceLanguage || "en",
-          targetLanguage: data.targetLanguage || "pt-BR",
-          status: "PENDING",
+          sourceLanguage: "en",
+          targetLanguage: "pt-BR",
+          status: ArticleStatus.TRANSLATING,
           originalContent: text,
           metadata: {
             extractionMethod: method,
-            pdfMetadata: metadata, 
             pageCount: metadata?.pages || 0,
-            author: metadata?.author || "Desconhecido",
-            characters: text.length,
-            words: text.split(/\s+/).length,
+            author: metadata?.author,
           },
+        },
+      });
+
+      const translatedContent = await TranslationService.translate(text);
+
+      const updatedArticle = await prisma.article.update({
+        where: { id: article.id },
+        data: {
+          translatedContent: translatedContent,
+          translatedTitle: `(PT) ${title}`,
+          status: ArticleStatus.COMPLETED,
+          completedAt: new Date(),
         },
       });
 
       return {
         success: true,
-        message: `Upload realizado com sucesso (via ${method})`,
-        articleId: article.id,
-        title,
-        author: metadata?.author || "Desconhecido",
-        pages: metadata?.pages || "N/A",
-        preview: text.substring(0, 200) + "...",
-        statistics: {
-          characters: text.length,
-          words: text.split(/\s+/).length,
-        },
+        message: "Artigo processado e traduzido!",
+        articleId: updatedArticle.id,
+        previewOriginal: text.substring(0, 100) + "...",
+        previewTranslated: translatedContent.substring(0, 100) + "..."
       };
-
     } catch (error: any) {
-      throw new Error(error.message || "Erro interno ao processar artigo.");
+      throw new Error(error.message);
     }
   }
-  
+
   static async listByUser(userId: string) {
     try {
       const articles = await prisma.article.findMany({

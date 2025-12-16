@@ -46,6 +46,8 @@ model Article {
   
   metadata            Json?
   
+  completedAt         DateTime? 
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -60,7 +62,7 @@ enum Role {
 
 enum ArticleStatus {
   PENDING
-  PROCESSING
+  TRANSLATING
   COMPLETED
   FAILED
 }
