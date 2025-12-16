@@ -1,5 +1,14 @@
 import { Request } from 'express';
 
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  role: 'USER' | 'PROFESSIONAL' | 'ADMIN';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface RegisterInput {
   email: string;
   password: string;
