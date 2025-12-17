@@ -7,7 +7,7 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post("/", uploadConfig.single("file"), ArticleController.upload);
+router.post("/upload", uploadConfig.single("file"), ArticleController.upload);
 router.put("/:id",ArticleController.upload);   
 router.get("/", ArticleController.list);     
 router.get("/:id", ArticleController.get);    
