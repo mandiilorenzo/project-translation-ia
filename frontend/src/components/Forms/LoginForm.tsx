@@ -8,6 +8,9 @@ import { z } from 'zod'
 import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react'
 import Input from '@/components/ui/input'
 import Button from '@/components/ui/button'
+import { AuthService } from '@/services/auth'
+import { isAxiosError } from 'axios'
+
 
 const loginSchema = z.object({
     email: z.string().email('Insira um e-mail válido'),
@@ -19,13 +22,9 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginForm() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
-    const [rootError, setRootError] = useState('') 
+    const [rootError, setRootError] = useState('')
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors }
-    } = useForm<LoginFormData>({
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema)
     })
 
@@ -34,17 +33,26 @@ export default function LoginForm() {
         setRootError('')
 
         try {
-            console.log('Tentativa de login:', data)
-            // Simulação de delay de rede
-            await new Promise(resolve => setTimeout(resolve, 1500))
+            const response = await AuthService.login(data)
 
-            // Lógica de sucesso aqui
-            // await signIn('credentials', { ... }) 
+            localStorage.setItem('medtranslate_token', response.token)
+            localStorage.setItem('medtranslate_user', JSON.stringify(response.user))
 
             router.push('/Dashboard')
-        } catch (err) {
-            console.error(err)
-            setRootError('E-mail ou senha incorretos. Por favor, tente novamente.')
+
+        } catch (error) {
+            console.error(error)
+
+            let message = 'E-mail ou senha incorretos.' 
+
+            if (isAxiosError(error)) {
+                message = error.response?.data?.error || error.response?.data?.message || message
+            }
+            else if (error instanceof Error) {
+                message = error.message
+            }
+
+            setRootError(message)
         } finally {
             setIsLoading(false)
         }
@@ -66,7 +74,7 @@ export default function LoginForm() {
                     type="email"
                     placeholder="nome@hospital.com"
                     icon={Mail}
-                    error={errors.email?.message} 
+                    error={errors.email?.message}
                     disabled={isLoading}
                     {...register('email')}
                 />

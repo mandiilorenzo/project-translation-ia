@@ -8,6 +8,8 @@ import { z } from 'zod'
 import { Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react'
 import Input from '@/components/ui/input'
 import Button from '@/components/ui/button'
+import { AuthService } from '@/services/auth'
+import { isAxiosError } from 'axios'
 
 const registerSchema = z.object({
     name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
@@ -39,16 +41,35 @@ export default function RegisterForm() {
         setRootError('')
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500))
+            await AuthService.register({
+                name: data.name,
+                email: data.email,
+                password: data.password
+            })
 
-            console.log('Dados de registro:', data)
-            // Lógica real: const res = await fetch('/api/register', ...)
+            const loginResponse = await AuthService.login({
+                email: data.email,
+                password: data.password
+            })
 
-            router.push('/login?registered=true')
+            localStorage.setItem('medtranslate_token', loginResponse.token)
+            localStorage.setItem('medtranslate_user', JSON.stringify(loginResponse.user))
+
+            router.push('/Dashboard')
 
         } catch (error) {
-            console.log(error)
-            setRootError('Não foi possível criar a conta. Tente novamente mais tarde.')
+            console.error(error)
+
+            let message = 'Não foi possível criar a conta. Tente novamente.'
+
+            if (isAxiosError(error)) {
+                message = error.response?.data?.error || error.response?.data?.message || message
+            }
+            else if (error instanceof Error) {
+                message = error.message
+            }
+
+            setRootError(message)
         } finally {
             setIsLoading(false)
         }
