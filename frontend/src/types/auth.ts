@@ -17,3 +17,16 @@ export interface AuthResponse {
   };
   token: string;
 }
+
+export interface UpdateProfileResponse {
+    success: boolean
+    message: string
+    user: {
+        id: string
+        name: string
+        email: string
+        role: string
+        createdAt: string
+        updatedAt: string
+    }
+}
