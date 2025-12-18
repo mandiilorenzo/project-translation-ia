@@ -58,7 +58,7 @@ export class ArticleService {
         message: "Artigo processado e traduzido!",
         articleId: updatedArticle.id,
         previewOriginal: text.substring(0, 100) + "...",
-        previewTranslated: translatedContent.substring(0, 100) + "..."
+        previewTranslated: translatedContent.substring(0, 100) + "...",
       };
     } catch (error: any) {
       throw new Error(error.message);
@@ -103,5 +103,25 @@ export class ArticleService {
     } catch (error: any) {
       throw new Error(error.message);
     }
+  }
+
+  static async delete(userId: string, articleId: string) {
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+    });
+
+    if (!article) {
+      throw new Error("Artigo não encontrado.");
+    }
+
+    if (article.userId !== userId) {
+      throw new Error("Você não tem permissão para excluir este artigo.");
+    }
+
+    await prisma.article.delete({
+      where: { id: articleId },
+    });
+
+    return true;
   }
 }

@@ -10,6 +10,7 @@ router.use(authenticate);
 router.post("/upload", uploadConfig.single("file"), ArticleController.upload);
 router.put("/:id",ArticleController.upload);   
 router.get("/", ArticleController.list);     
-router.get("/:id", ArticleController.get);    
+router.get("/:id", ArticleController.get);
+router.delete("/:id", ArticleController.delete); 
 
 export default router;

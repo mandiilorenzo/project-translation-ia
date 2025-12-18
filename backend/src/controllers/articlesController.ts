@@ -1,8 +1,8 @@
 import { Response } from "express";
 import { ArticleService } from "../services/articlesService";
-import { AuthRequest } from "../types/auth"; 
+import { AuthRequest } from "../types/auth";
 import { uploadConfig } from "../config/multer";
-import fs from "fs"; 
+import fs from "fs";
 
 const upload = uploadConfig;
 
@@ -25,7 +25,7 @@ export class ArticleController {
 
       const result = await ArticleService.create(userId, {
         fileName: file.originalname,
-        filePath: file.path, 
+        filePath: file.path,
         fileSize: file.size,
         fileType: file.mimetype,
         originalTitle: req.body.title || req.body.originalTitle,
@@ -72,6 +72,27 @@ export class ArticleController {
       return res.status(200).json(article);
     } catch (error: any) {
       const statusCode = error.message.includes("não encontrado") ? 404 : 500;
+      return res.status(statusCode).json({ error: error.message });
+    }
+  }
+
+  static async delete(req: AuthRequest, res: Response) {
+    try {
+      const userId = req.user?.id;
+      const { id } = req.params;
+
+      if (!userId) return res.status(401).json({ error: "Não autenticado" });
+
+      await ArticleService.delete(userId, id);
+
+      return res.status(200).json({ message: "Artigo excluído com sucesso." });
+    } catch (error: any) {
+      console.error(error);
+      const statusCode =
+        error.message.includes("permissão") ||
+        error.message.includes("não encontrado")
+          ? 403
+          : 500;
       return res.status(statusCode).json({ error: error.message });
     }
   }
