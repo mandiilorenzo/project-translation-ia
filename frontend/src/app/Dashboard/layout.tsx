@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation' 
 import {
     Languages,
     LayoutDashboard,
@@ -9,14 +12,39 @@ import {
     Bell,
 } from 'lucide-react'
 import NavItemProps from '@/types/navItem'
+import { useEffect, useState } from 'react'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname() 
+    const router = useRouter()
+
+    const [userName, setUserName] = useState('Usuário')
+    const [userType, setUserType] = useState('Plano Gratuito')
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const storedUser = localStorage.getItem('medtranslate_user')
+            if (storedUser) {
+                const user = JSON.parse(storedUser)
+                setUserName(user.name)
+            }
+        }, 0)
+
+        return () => clearTimeout(timer)
+    }, [])
+
+    const handleLogout = () => {
+        localStorage.removeItem('medtranslate_token')
+        localStorage.removeItem('medtranslate_user')
+        router.push('/LandingPage')
+    }
+
     return (
         <div className="min-h-screen bg-slate-50 flex overflow-hidden">
 
             <aside className="hidden lg:flex flex-col w-72 bg-slate-900 border-r border-slate-800 fixed h-full z-20 transition-all">
                 <div className="p-6 h-20 flex items-center border-b border-slate-800">
-                    <Link href="/dashboard" className="flex items-center gap-3 group">
+                    <Link href="/Dashboard" className="flex items-center gap-3 group">
                         <div className="bg-teal-600/20 border border-teal-500/30 p-2 rounded-lg group-hover:bg-teal-600 group-hover:border-teal-500 transition-all duration-300">
                             <Languages className="w-5 h-5 text-teal-400 group-hover:text-white" />
                         </div>
@@ -28,25 +56,55 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                 <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                     <p className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Principal</p>
-                    <NavItem href="/dashboard" icon={LayoutDashboard} active>Nova Tradução</NavItem>
-                    <NavItem href="/dashboard/history" icon={History}>Histórico</NavItem>
+
+                    <NavItem
+                        href="/Dashboard"
+                        icon={LayoutDashboard}
+                        active={pathname === '/Dashboard'}
+                    >
+                        Nova Tradução
+                    </NavItem>
+
+                    <NavItem
+                        href="/Dashboard/history"
+                        icon={History}
+                        active={pathname.includes('/Dashboard/history') || pathname.includes('/Dashboard/articles')}
+                    >
+                        Histórico
+                    </NavItem>
 
                     <p className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mt-8 mb-2">Ferramentas</p>
-                    <NavItem href="/dashboard/glossary" icon={Book}>Glossário Pessoal</NavItem>
-                    <NavItem href="/dashboard/settings" icon={Settings}>Configurações</NavItem>
+                    <NavItem
+                        href="/Dashboard/glossary"
+                        icon={Book}
+                        active={pathname === '/Dashboard/glossary'}
+                    >
+                        Glossário Pessoal
+                    </NavItem>
+
+                    <NavItem
+                        href="/Dashboard/settings"
+                        icon={Settings}
+                        active={pathname === '/Dashboard/settings'}
+                    >
+                        Configurações
+                    </NavItem>
                 </nav>
 
                 <div className="p-4 border-t border-slate-800 bg-slate-900/50">
                     <div className="flex items-center gap-3 mb-4 px-2">
                         <div className="w-8 h-8 rounded-full bg-linear-to-tr from-teal-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-slate-800">
-                            AS
+                            {userName.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-white truncate">Dra. Ana Silva</p>
-                            <p className="text-xs text-slate-500 truncate">Plano Profissional</p>
+                            <p className="text-sm font-medium text-white truncate">{userName}</p>
+                            <p className="text-xs text-slate-500 truncate">{userType}</p>
                         </div>
                     </div>
-                    <button className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors">
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-colors"
+                    >
                         <LogOut className="w-4 h-4" />
                         Sair
                     </button>
@@ -54,7 +112,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </aside>
 
             <main className="lg:ml-72 flex-1 flex flex-col min-h-screen relative z-10">
-
                 <div className="fixed inset-0 z-0 pointer-events-none">
                     <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-100/40 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/4"></div>
                     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4"></div>

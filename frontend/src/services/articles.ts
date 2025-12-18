@@ -37,4 +37,13 @@ export const ArticlesService = {
     const response = await api.get<Article>(`/api/articles/${id}`);
     return response.data;
   },
+
+  getAll: async () => {
+    const response = await api.get<Article[]>('/api/articles')
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await api.delete(`/api/articles/${id}`);
+  }
 };
