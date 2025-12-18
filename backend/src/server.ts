@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/authRoute";
 import articleRoutes from "./routes/articlesRoute";
-//import translateRoutes from "./routes/translate.routes";
+import aiRoutes from './routes/aiRoute';
 
 dotenv.config();
 
@@ -34,10 +34,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
-//app.use("/api/translate", translateRoutes);
+app.use("/api/ai", aiRoutes);
+
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -49,7 +49,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Test database connection
 app.get("/api/test-db", async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -68,7 +67,6 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// 404 handler
 app.use("*", (req, res) => {
   res.status(404).json({
     success: false,
@@ -76,7 +74,6 @@ app.use("*", (req, res) => {
   });
 });
 
-// Error handling middleware
 app.use((error: any, req: any, res: any, next: any) => {
   console.error("Server error:", error);
   res.status(error.status || 500).json({
@@ -86,19 +83,17 @@ app.use((error: any, req: any, res: any, next: any) => {
   });
 });
 
-// Start server
 const server = app.listen(PORT, () => {
   console.log(`
-🚀 Backend Server Started!
-📍 Port: ${PORT}
-🌐 Environment: ${process.env.NODE_ENV}
-📅 ${new Date().toISOString()}
-🔗 Health check: http://localhost:${PORT}/api/health
-🗄️  DB test: http://localhost:${PORT}/api/test-db
+  Backend Server Started!
+  Port: ${PORT}
+  Environment: ${process.env.NODE_ENV}
+  ${new Date().toISOString()}
+  Health check: http://localhost:${PORT}/api/health
+  DB test: http://localhost:${PORT}/api/test-db
   `);
 });
 
-// Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("SIGTERM received. Shutting down gracefully...");
   server.close(() => {
