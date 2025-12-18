@@ -12,7 +12,8 @@ import {
     Loader2
 } from 'lucide-react'
 import Button from '@/components/ui/button'
-import { ArticlesService, UploadResponse } from '@/services/articles'
+import { ArticlesService } from '@/services/articles'
+import { UploadResponse } from '@/types/articles'
 import Link from 'next/link'
 import { isAxiosError } from 'axios'
 
@@ -242,7 +243,7 @@ return (
                                 </div>
 
                                 <div className="flex gap-4">
-                                    <Link href={`/dashboard/articles/${result.articleId}`}>
+                                    <Link href={`/Dashboard/articles/${result.articleId}`}>
                                         <Button size="lg" className="shadow-xl shadow-teal-600/20">
                                             <FileText className="w-5 h-5 mr-2" /> Ler Tradução
                                         </Button>

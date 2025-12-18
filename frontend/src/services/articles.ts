@@ -1,38 +1,40 @@
 import { api } from "./api";
-
-export interface UploadResponse {
-  success: boolean;
-  message: string;
-  articleId: string;
-  title: string;
-  previewOriginal: string;
-  previewTranslated: string;
-}
+import { Article, UploadResponse } from "../types/articles";
 
 export const ArticlesService = {
-    upload: async ( file: File, onProgress: (progress: number) => void ): Promise<UploadResponse> => {
+  upload: async (
+    file: File,
+    onProgress: (progress: number) => void
+  ): Promise<UploadResponse> => {
     const formData = new FormData();
     formData.append("file", file);
 
     formData.append("sourceLanguage", "en");
     formData.append("targetLanguage", "pt-BR");
 
-    const response = await api.post<UploadResponse>( "api/articles/upload", formData,
-    {
+    const response = await api.post<UploadResponse>(
+      "api/articles/upload",
+      formData,
+      {
         headers: {
-            "Content-Type": "multipart/form-data",
+          "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
+          if (progressEvent.total) {
             const percentCompleted = Math.round(
               (progressEvent.loaded * 100) / progressEvent.total
             );
             onProgress(percentCompleted);
-        }
-    },
-}
+          }
+        },
+      }
     );
 
     return response.data;
-},
+  },
+
+  getById: async (id: string) => {
+    const response = await api.get<Article>(`/api/articles/${id}`);
+    return response.data;
+  },
 };
