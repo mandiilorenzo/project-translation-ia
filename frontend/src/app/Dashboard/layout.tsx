@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const handleLogout = () => {
         localStorage.removeItem('medtranslate_token')
         localStorage.removeItem('medtranslate_user')
-        router.push('/LandingPage')
+        router.push('/')
     }
 
     return (
