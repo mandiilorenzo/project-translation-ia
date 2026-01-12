@@ -1,9 +1,13 @@
 'use client'
 
 import { CheckCircle2 } from 'lucide-react';
-import Button from '@/components/ui/button'; 
+import Button from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+
 
 export default function CTASection() {
+    const router = useRouter();
+
     return (
         <section className="py-24 bg-teal-50 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
@@ -21,7 +25,7 @@ export default function CTASection() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <Button size="lg" variant="primary" className="shadow-xl shadow-teal-900/10">
+                    <Button size="lg" variant="primary" className="shadow-xl shadow-teal-900/10" onClick={() => router.push('/Register')}>
                         Criar Conta Gratuita
                     </Button>
                 </div>

@@ -3,9 +3,11 @@
 import { ArrowRight, Zap, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import Button from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
     const [showTranslation, setShowTranslation] = useState(false);
+    const router = useRouter();
 
     const englishText =
         "The efficacy of novel immunotherapeutic agents in treating advanced malignancies has demonstrated significant clinical outcomes in recent meta-analyses.";
@@ -46,6 +48,7 @@ export default function HeroSection() {
                                 size="lg"
                                 variant="primary"
                                 className="gap-2"
+                                onClick={() => router.push('/Register')}
                             >
                                 Começar Agora
                                 <ArrowRight className="w-5 h-5" aria-hidden="true" />
