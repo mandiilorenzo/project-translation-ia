@@ -10,6 +10,12 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      PORT: 5000  
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      AI_SERVICE_URL: ${{ secrets.AI_SERVICE_URL }}
+
     steps:
     - name: Checkout do código
       uses: actions/checkout@v4
@@ -31,14 +37,9 @@ jobs:
       run: |
         cd backend
         npm ci
-        npx prisma generate  
+        npx prisma generate
 
     - name: Rodar Testes (Jest)
       run: |
         cd backend
         npm test
-      env:
-        PORT: 5000
-        DATABASE_URL: "postgresql://user:pass@localhost:5432/db_test"
-        JWT_SECRET: "falso_apenas_para_teste_ci"
-        AI_SERVICE_URL: "http://localhost:8000"
