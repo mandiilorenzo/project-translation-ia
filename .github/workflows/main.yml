@@ -15,6 +15,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       AI_SERVICE_URL: ${{ secrets.AI_SERVICE_URL }}
+      GEMINI_API_KEY: "chave_falsa_para_passar_no_ci"
 
     steps:
     - name: Checkout do código
