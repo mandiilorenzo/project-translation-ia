@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { AIController } from '../controllers/aiController';
-import { authenticate } from '../middleware/authMiddleware'; 
+//import { authenticate } from '../middleware/authMiddleware'; 
 
 const router = Router();
-router.use(authenticate);
+//router.use(authenticate);
 
 router.post('/glossary', AIController.generateGlossary);
 

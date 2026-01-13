@@ -4,8 +4,6 @@ import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import cookieParser from "cookie-parser";
 
-
-
 import authRoutes from "./routes/authRoute";
 import articleRoutes from "./routes/articlesRoute";
 import aiRoutes from './routes/aiRoute';
@@ -28,7 +26,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
@@ -38,14 +35,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/ai", aiRoutes);
 
-
-// Health check endpoint
 app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    database: "connected", // We'll verify this later
+    database: "connected", 
   });
 });
 
@@ -83,23 +78,24 @@ app.use((error: any, req: any, res: any, next: any) => {
   });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`
-  Backend Server Started!
-  Port: ${PORT}
-  Environment: ${process.env.NODE_ENV}
-  ${new Date().toISOString()}
-  Health check: http://localhost:${PORT}/api/health
-  DB test: http://localhost:${PORT}/api/test-db
-  `);
-});
-
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
-  server.close(() => {
-    console.log("Server closed.");
-    prisma.$disconnect();
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log(`
+    Backend Server Started! 
+    Port: ${PORT}
+    Environment: ${process.env.NODE_ENV}
+    ${new Date().toISOString()}
+    Health check: http://localhost:${PORT}/api/health
+    `);
   });
-});
 
-export default app;
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received. Shutting down gracefully...");
+    server.close(() => {
+      console.log("Server closed.");
+      prisma.$disconnect();
+    });
+  });
+}
+
+export default app; 
